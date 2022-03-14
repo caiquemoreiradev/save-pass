@@ -30,7 +30,9 @@ const schema = Yup.object().shape({
 })
 
 export function RegisterLoginData() {
+
   const { navigate } = useNavigation();
+
   const {
     control,
     handleSubmit,
@@ -42,14 +44,21 @@ export function RegisterLoginData() {
   });
 
   async function handleRegister(formData: FormData) {
+
     const newLoginData = {
       id: String(uuid.v4()),
       ...formData
     }
 
     const dataKey = '@savepass:logins';
+    const response = await AsyncStorage.getItem(dataKey);
+    const passwords = response ? JSON.parse(response) : [];
 
     // Save data on AsyncStorage and navigate to 'Home' screen
+
+    AsyncStorage.setItem(dataKey, JSON.stringify([...passwords, newLoginData]));
+
+    navigate('Home');
   }
 
   return (
@@ -67,7 +76,7 @@ export function RegisterLoginData() {
             name="service_name"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              errors.service_name && errors.service_name.message
             }
             control={control}
             autoCapitalize="sentences"
@@ -79,7 +88,7 @@ export function RegisterLoginData() {
             name="email"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              errors.email && errors.email.message
             }
             control={control}
             autoCorrect={false}
@@ -92,7 +101,7 @@ export function RegisterLoginData() {
             name="password"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              errors.password && errors.password.message
             }
             control={control}
             secureTextEntry
